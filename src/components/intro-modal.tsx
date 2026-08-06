@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import { Leaf, Monitor, SlidersHorizontal, Tag } from "lucide-react";
 
-const SESSION_KEY = "terravida-intro-seen";
+const SESSION_KEY = "enbandeja-intro-seen";
 
 const points = [
   {
     icon: Monitor,
-    text: "Esta demo fue preparada para mostrar una idea de cómo podría digitalizarse la operación del casino TerraVida.",
+    text: "Casino Enbandeja es un casino de ejemplo, creado para mostrar cómo podría digitalizarse la operación de un casino escolar.",
   },
   {
     icon: Tag,
@@ -16,7 +16,7 @@ const points = [
   },
   {
     icon: SlidersHorizontal,
-    text: "La versión final se ajustaría según la forma de trabajo y necesidades del casino.",
+    text: "La versión final se ajustaría según la forma de trabajo y necesidades de su casino.",
   },
 ];
 
@@ -50,7 +50,7 @@ export function IntroModal() {
         </span>
 
         <h2 id="intro-title" className="display-font mt-5 text-2xl font-extrabold leading-tight text-[var(--navy-dark)] sm:text-3xl">
-          Así podría verse TerraVida
+          Así podría verse su casino digital
         </h2>
 
         <div className="my-6 flex items-center justify-center gap-3" aria-hidden="true">

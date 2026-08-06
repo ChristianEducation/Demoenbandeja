@@ -29,7 +29,7 @@ export default function HomePage() {
         </header>
 
         <h1 className="display-font mt-9 text-[1.85rem] font-bold leading-[1.1] tracking-[-0.02em] sm:text-[2.05rem]">
-          Una forma más simple de gestionar los almuerzos
+          Así puede verse su casino digital
         </h1>
         <p className="mt-3 text-[var(--muted)]">
           Reservas, pagos y listado diario reunidos en un mismo flujo.

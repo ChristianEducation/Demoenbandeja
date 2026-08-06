@@ -53,7 +53,7 @@ export default function CasinoPage() {
   return (
     <>
       <PanelHeader
-        eyebrow="Casino Terravida"
+        eyebrow="Casino Enbandeja"
         title="Operación del día"
         description="Preparación de cocina y entregas por alumno, en un mismo lugar."
         actions={

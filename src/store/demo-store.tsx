@@ -136,7 +136,7 @@ interface DemoContextValue extends DemoState {
 }
 
 const DemoContext = createContext<DemoContextValue | null>(null);
-const STORAGE_KEY = "terravida-demo-state-v2";
+const STORAGE_KEY = "enbandeja-demo-state-v1";
 
 export function DemoProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, undefined, createInitialState);

@@ -5,8 +5,8 @@ import { IntroModal } from "@/components/intro-modal";
 import { DemoProvider } from "@/store/demo-store";
 
 export const metadata: Metadata = {
-  title: "Casino Terravida · CRECIENDO SANO — Demo",
-  description: "Demo referencial para la gestión digital de almuerzos escolares de Casino Terravida.",
+  title: "Casino Enbandeja · De la cocina a la mesa — Demo",
+  description: "Demo referencial para la gestión digital de almuerzos y cafetería de un casino escolar.",
 };
 
 export const viewport: Viewport = {

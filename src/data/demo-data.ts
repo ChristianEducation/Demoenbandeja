@@ -118,8 +118,8 @@ export const initialMenus: MenuWeek[] = [
 ];
 
 export const cafeteriaProducts: CafeteriaProduct[] = [
-  { id: "cafe-fajita", name: "Fajita TerraVida", description: "Pollo, palta, queso y pico de gallo", category: "sandwiches", price: 2600 },
-  { id: "cafe-sanguche", name: "Sánguche TerraVida", description: "Jamón, queso y tomate en pan artesanal", category: "sandwiches", price: 2400 },
+  { id: "cafe-fajita", name: "Fajita de pollo", description: "Pollo, palta, queso y pico de gallo", category: "sandwiches", price: 2600 },
+  { id: "cafe-sanguche", name: "Sánguche de jamón y queso", description: "Jamón, queso y tomate en pan artesanal", category: "sandwiches", price: 2400 },
   { id: "cafe-energy", name: "Vaso Energy", description: "Mix de frutos secos y semillas", category: "snacks", price: 1800 },
   { id: "cafe-frutas", name: "Vaso de frutas", description: "Frutas de estación cortadas", category: "snacks", price: 1600 },
   { id: "cafe-magdalenas", name: "Magdalenas", description: "Pack de 3 unidades", category: "horneados", price: 1500 },
@@ -128,7 +128,7 @@ export const cafeteriaProducts: CafeteriaProduct[] = [
   { id: "cafe-jugo", name: "Jugo natural", description: "Jugo natural de fruta de estación", category: "bebestibles", price: 1300 },
 ];
 
-// Valores demo. No corresponden a tarifas vigentes de Terravida.
+// Valores demo. No corresponden a tarifas vigentes de ningún casino real.
 export const initialConfig: DemoConfig = {
   dailyLunchPrice: 5200,
   weeklyLunchUnitPrice: 4700,
