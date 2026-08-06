@@ -241,7 +241,7 @@ export default function WeekAgendaPage() {
             </div>
           </section>
 
-          <aside className="surface hidden rounded-2xl p-4 lg:sticky lg:top-5 lg:block" aria-label="Resumen del pedido" data-tour="order-summary">
+          <aside className="surface hidden rounded-2xl p-4 lg:sticky lg:top-5 lg:block" aria-label="Resumen del pedido">
             <p className="eyebrow mb-2">Tu pedido</p>
             <h2 className="display-font mb-0.5 text-lg font-bold">{student.name}</h2>
             <p className="text-sm text-[var(--muted)]">{student.course}</p>

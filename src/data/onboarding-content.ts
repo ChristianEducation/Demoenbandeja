@@ -21,9 +21,8 @@ export const apoderadoTourSteps: TourStep[] = [
     body: "Cada almuerzo se cobra al precio diario. Si completas los cuatro días de una misma semana, esos cuatro pasan solos a la tarifa semanal, que es más baja. La cafetería se cobra aparte y no entra en ese cálculo.",
   },
   {
-    anchor: "order-summary",
     title: "Tu pedido",
-    body: "Aquí se va armando todo, con el total siempre a la vista. Puedes cambiar de semana sin perderlo, y también comprar solo cafetería, sin almuerzo.",
+    body: "Todo lo que agregues se junta en un resumen con el total siempre visible. Puedes cambiar de semana sin perderlo, y también comprar solo cafetería, sin almuerzo.",
   },
 ];
 

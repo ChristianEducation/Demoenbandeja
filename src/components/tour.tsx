@@ -89,7 +89,23 @@ export function Tour({
     el.classList.add("tour-highlight");
     highlightedRef.current = el;
     if (mobile) {
-      el.scrollIntoView({ block: "center", behavior: "smooth" });
+      // La hoja del tutorial es de posición fija y tapa la parte inferior de
+      // la pantalla; su alto cambia según el texto de cada paso. Centrar en
+      // toda la altura del celular (scrollIntoView estándar) no lo sabe, así
+      // que en pasos con texto largo el elemento señalado queda tapado.
+      // Acá se centra solo en el espacio libre que queda arriba de la hoja.
+      const cardHeight = cardRef.current?.offsetHeight || 200;
+      const freeHeight = Math.max(120, window.innerHeight - cardHeight - 32);
+      const topMargin = 16;
+      const current = el.getBoundingClientRect();
+      const desiredTop =
+        current.height <= freeHeight - topMargin
+          ? topMargin + (freeHeight - topMargin - current.height) / 2
+          : topMargin;
+      const delta = current.top - desiredTop;
+      if (Math.abs(delta) > 2) {
+        window.scrollBy({ top: delta, behavior: "smooth" });
+      }
       return;
     }
     anchorRectRef.current = rect;
