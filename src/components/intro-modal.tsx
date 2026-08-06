@@ -16,7 +16,7 @@ const points = [
   },
   {
     icon: SlidersHorizontal,
-    text: "La versión final se ajustaría según la forma de trabajo y necesidades de su casino.",
+    text: "Aquí se reserva el día, no un plato en particular: el menú muestra las alternativas de cada día. La versión final se ajusta a la forma de trabajo de su casino.",
   },
 ];
 

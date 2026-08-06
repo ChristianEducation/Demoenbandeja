@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Check, Clock3, Leaf } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Clock3, HelpCircle, Leaf } from "lucide-react";
 import { FlowGuard } from "@/components/flow-guard";
+import { InfoTip } from "@/components/info-tip";
 import { PortalShell } from "@/components/portal-shell";
 import { QuantityStepper } from "@/components/quantity-stepper";
+import { Tour } from "@/components/tour";
 import { WeekStrip } from "@/components/week-strip";
 import { DEMO_TODAY, cafeteriaCategoryLabels, students } from "@/data/demo-data";
+import { apoderadoTourSteps, infoTips } from "@/data/onboarding-content";
 import { bookingBlockReason } from "@/lib/booking";
 import { formatCLP, formatLongDate } from "@/lib/format";
 import {
@@ -41,6 +44,7 @@ export default function WeekAgendaPage() {
   const week = menus[selectedWeekIndex];
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [category, setCategory] = useState<CafeteriaCategory | "all">("all");
+  const [tourSignal, setTourSignal] = useState(0);
 
   useEffect(() => {
     setSelectedDate(week.days[0]?.date ?? null);
@@ -73,15 +77,24 @@ export default function WeekAgendaPage() {
   return (
     <PortalShell step={2}>
       <div className={itemCount > 0 ? "pb-24 lg:pb-0" : ""}>
-        <div className="mb-5">
-          <span className="eyebrow">Mi semana</span>
-          <h1 className="display-font mt-2 text-[1.55rem] font-bold leading-none tracking-[-0.02em] sm:text-[1.75rem]">
-            ¿Qué necesita {student.name.split(" ")[0]} esta semana?
-          </h1>
-          <p className="mt-2 mb-0 text-sm text-[var(--muted)]">{student.name} · {student.course}</p>
+        <div className="mb-5 flex items-start justify-between gap-3">
+          <div>
+            <span className="eyebrow">Mi semana</span>
+            <h1 className="display-font mt-2 text-[1.55rem] font-bold leading-none tracking-[-0.02em] sm:text-[1.75rem]">
+              ¿Qué necesita {student.name.split(" ")[0]} esta semana?
+            </h1>
+            <p className="mt-2 mb-0 text-sm text-[var(--muted)]">{student.name} · {student.course}</p>
+          </div>
+          <button
+            type="button"
+            className="btn-quiet shrink-0 px-2.5 text-xs"
+            onClick={() => setTourSignal((value) => value + 1)}
+          >
+            <HelpCircle size={14} /> ¿Cómo funciona?
+          </button>
         </div>
 
-        <div className="surface mb-5 rounded-2xl p-4">
+        <div className="surface mb-5 rounded-2xl p-4" data-tour="week-strip">
           <WeekStrip
             weeks={menus}
             weekIndex={selectedWeekIndex}
@@ -128,11 +141,14 @@ export default function WeekAgendaPage() {
               <Check size={14} /> Tarifa semanal aplicada
             </p>
           )}
+          {!showFullWeekButton && !isFullWeek && (weekBlockedAny || weekHistoricalAny) && (
+            <p className="mt-3 mb-0 text-xs text-[var(--muted)]">{infoTips.noFullWeek}</p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_20rem]">
           <section>
-            <div className="surface rounded-2xl p-4 sm:p-5">
+            <div className="surface rounded-2xl p-4 sm:p-5" data-tour="lunch-card">
               <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.08em] text-[var(--muted)]">
                 Almuerzo de {formatLongDate(day.date)}
               </p>
@@ -148,14 +164,26 @@ export default function WeekAgendaPage() {
               </div>
               <p className="mt-3 mb-0 text-sm text-[var(--muted)]">Incluye {[...day.sides, day.dessert].join(" · ")}</p>
               <div className="mt-4 flex items-center justify-between gap-3 border-t border-[var(--line)] pt-4">
-                <strong className="tabular-nums">{formatCLP(config.dailyLunchPrice)}</strong>
+                <span className="inline-flex items-center gap-1.5">
+                  <strong className="tabular-nums">{formatCLP(config.dailyLunchPrice)}</strong>
+                  <InfoTip text={infoTips.weeklyRate} label="Cómo se calcula el precio" />
+                </span>
                 {hasHistoricalLunch ? (
-                  <span className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-[var(--pine-soft)] px-3 text-sm font-extrabold text-[var(--pine)]">
-                    <Check size={16} /> Ya reservado
+                  <span className="inline-flex items-center gap-2">
+                    <span className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-[var(--pine-soft)] px-3 text-sm font-extrabold text-[var(--pine)]">
+                      <Check size={16} /> Ya reservado
+                    </span>
+                    <InfoTip text={infoTips.alreadyBooked} label="Por qué ya está reservado" />
                   </span>
                 ) : dayBlock ? (
-                  <span className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-[oklch(96%_0.008_100)] px-3 text-sm font-extrabold text-[var(--muted)]">
-                    <Clock3 size={16} /> Cerrado
+                  <span className="inline-flex items-center gap-2">
+                    <span className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-[oklch(96%_0.008_100)] px-3 text-sm font-extrabold text-[var(--muted)]">
+                      <Clock3 size={16} /> Cerrado
+                    </span>
+                    <InfoTip
+                      text={dayBlock === "past" ? infoTips.pastDay : infoTips.cutoffReached(config.bookingCutoff)}
+                      label="Por qué está cerrado"
+                    />
                   </span>
                 ) : (
                   <button type="button" className={lunchInCart ? "btn-secondary" : "btn-primary"} onClick={() => toggleLunch(day.date)} aria-pressed={lunchInCart}>
@@ -213,7 +241,7 @@ export default function WeekAgendaPage() {
             </div>
           </section>
 
-          <aside className="surface hidden rounded-2xl p-4 lg:sticky lg:top-5 lg:block" aria-label="Resumen del pedido">
+          <aside className="surface hidden rounded-2xl p-4 lg:sticky lg:top-5 lg:block" aria-label="Resumen del pedido" data-tour="order-summary">
             <p className="eyebrow mb-2">Tu pedido</p>
             <h2 className="display-font mb-0.5 text-lg font-bold">{student.name}</h2>
             <p className="text-sm text-[var(--muted)]">{student.course}</p>
@@ -269,6 +297,7 @@ export default function WeekAgendaPage() {
           </Link>
         </div>
       )}
+      <Tour steps={apoderadoTourSteps} storageKey="enbandeja-tour-apoderado-seen" reopenSignal={tourSignal} />
     </PortalShell>
   );
 }

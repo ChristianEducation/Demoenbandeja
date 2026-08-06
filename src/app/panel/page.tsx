@@ -7,15 +7,20 @@ import {
   ClipboardList,
   Clock3,
   Coffee,
+  HelpCircle,
   Plus,
   Search,
   UserRoundPlus,
   UtensilsCrossed,
   X,
+  type LucideIcon,
 } from "lucide-react";
+import { InfoTip } from "@/components/info-tip";
 import { PanelHeader } from "@/components/panel-ui";
+import { Tour } from "@/components/tour";
 import { WeekStrip } from "@/components/week-strip";
 import { DEMO_TODAY, cafeteriaCategoryLabels, courses, students } from "@/data/demo-data";
+import { infoTips, panelTourSteps } from "@/data/onboarding-content";
 import { formatLongDate, matchesSearch } from "@/lib/format";
 import { aggregateCafeteria, cafeteriaItemCountForDate, lunchCountForDate, packagesForDate, type DeliveryPackage } from "@/lib/operations";
 import { deliveryKey, useDemo } from "@/store/demo-store";
@@ -39,6 +44,8 @@ export default function CasinoPage() {
   const [date, setDate] = useState(DEMO_TODAY);
   const [showAdd, setShowAdd] = useState(false);
   const [toast, setToast] = useState("");
+  const [tourSignal, setTourSignal] = useState(0);
+  const [showTourBanner, setShowTourBanner] = useState(false);
 
   const activeMenuDay = menus.flatMap((item) => item.days).find((day) => day.date === date);
   const packages = useMemo(() => packagesForDate(orders, date), [orders, date]);
@@ -50,6 +57,30 @@ export default function CasinoPage() {
     return () => window.clearTimeout(timer);
   }, [toast]);
 
+  useEffect(() => {
+    try {
+      if (!window.sessionStorage.getItem("enbandeja-tour-panel-seen")) setShowTourBanner(true);
+    } catch {
+      // sessionStorage no disponible; no bloquear la demo.
+    }
+  }, []);
+
+  const dismissTourBanner = () => {
+    setShowTourBanner(false);
+    try {
+      window.sessionStorage.setItem("enbandeja-tour-panel-seen", "1");
+    } catch {
+      // ignore
+    }
+  };
+
+  const metrics: { label: string; value: string | number; icon: LucideIcon; tip?: string }[] = [
+    { label: "Almuerzos", value: lunchCountForDate(orders, date), icon: UtensilsCrossed },
+    { label: "Cafetería", value: `${cafeteriaItemCountForDate(orders, date)} ítems`, icon: Coffee },
+    { label: "Pedidos", value: packages.length, icon: ClipboardList, tip: infoTips.ordersMetric },
+    { label: "Pendientes", value: pendingCount, icon: Clock3 },
+  ];
+
   return (
     <>
       <PanelHeader
@@ -57,13 +88,46 @@ export default function CasinoPage() {
         title="Operación del día"
         description="Preparación de cocina y entregas por alumno, en un mismo lugar."
         actions={
-          <button type="button" className="btn-primary" onClick={() => setShowAdd(true)}>
-            <Plus size={17} /> Agregar almuerzo manual
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              className="btn-quiet px-2.5 text-xs"
+              onClick={() => setTourSignal((value) => value + 1)}
+            >
+              <HelpCircle size={14} /> ¿Cómo funciona?
+            </button>
+            <span className="inline-flex items-center gap-1.5">
+              <button type="button" className="btn-primary" onClick={() => setShowAdd(true)}>
+                <Plus size={17} /> Agregar almuerzo manual
+              </button>
+              <InfoTip text={infoTips.manualLunch} label="Para qué sirve el almuerzo manual" />
+            </span>
+          </div>
         }
       />
 
-      <div className="surface mb-5 rounded-2xl p-4">
+      {showTourBanner && (
+        <div className="surface mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl px-4 py-3">
+          <p className="mb-0 text-sm font-semibold text-[var(--ink)]">Primera vez en el panel · Ver recorrido (4 pasos)</p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="btn-primary px-3 text-xs"
+              onClick={() => {
+                dismissTourBanner();
+                setTourSignal((value) => value + 1);
+              }}
+            >
+              Ver recorrido
+            </button>
+            <button type="button" className="btn-quiet px-3 text-xs" onClick={dismissTourBanner}>
+              No, gracias
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="surface mb-5 rounded-2xl p-4" data-tour="panel-date">
         <WeekStrip
           weeks={menus}
           weekIndex={weekIndex}
@@ -82,14 +146,14 @@ export default function CasinoPage() {
           <button type="button" role="tab" aria-selected={tab === "preparacion"} className={`rounded-lg px-4 text-sm font-extrabold transition-colors ${tab === "preparacion" ? "bg-[var(--paper)] text-[var(--navy-dark)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setTab("preparacion")}>
             Preparación
           </button>
-          <button type="button" role="tab" aria-selected={tab === "entregas"} className={`rounded-lg px-4 text-sm font-extrabold transition-colors ${tab === "entregas" ? "bg-[var(--paper)] text-[var(--navy-dark)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setTab("entregas")}>
+          <button type="button" role="tab" aria-selected={tab === "entregas"} data-tour="panel-entregas-tab" className={`rounded-lg px-4 text-sm font-extrabold transition-colors ${tab === "entregas" ? "bg-[var(--paper)] text-[var(--navy-dark)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setTab("entregas")}>
             Entregas
           </button>
         </div>
 
         <div className="flex items-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--paper)] px-2 py-1.5">
           <span className="hidden text-xs font-bold text-[var(--muted)] sm:inline">Corte {config.bookingCutoff}</span>
-          <div className="flex rounded-lg bg-[oklch(94%_0.014_110)] p-0.5" role="group" aria-label="Modo de corte (demo)">
+          <div className="flex rounded-lg bg-[oklch(94%_0.014_110)] p-0.5" role="group" aria-label="Modo de corte (demo)" data-tour="panel-cutoff">
             {cutoffModes.map((mode) => (
               <button
                 key={mode.id}
@@ -104,19 +168,17 @@ export default function CasinoPage() {
         </div>
       </div>
 
-      <section className="surface grid grid-cols-2 divide-x divide-y divide-[var(--line)] overflow-hidden rounded-xl sm:grid-cols-4 sm:divide-y-0" aria-label="Métricas del día">
-        {[
-          { label: "Almuerzos", value: lunchCountForDate(orders, date), icon: UtensilsCrossed },
-          { label: "Cafetería", value: `${cafeteriaItemCountForDate(orders, date)} ítems`, icon: Coffee },
-          { label: "Pedidos", value: packages.length, icon: ClipboardList },
-          { label: "Pendientes", value: pendingCount, icon: Clock3 },
-        ].map((metric) => {
+      <section className="surface grid grid-cols-2 divide-x divide-y divide-[var(--line)] overflow-hidden rounded-xl sm:grid-cols-4 sm:divide-y-0" aria-label="Métricas del día" data-tour="panel-metrics">
+        {metrics.map((metric) => {
           const Icon = metric.icon;
           return (
             <article key={metric.label} className="min-w-0 px-3 py-3 sm:flex sm:items-center sm:gap-3 sm:px-4">
               <Icon size={16} className="mb-2 text-[var(--navy)] sm:mb-0" />
               <div className="min-w-0">
-                <p className="mb-0.5 truncate text-[0.6rem] font-extrabold uppercase tracking-[0.07em] text-[var(--muted)]">{metric.label}</p>
+                <p className="mb-0.5 flex items-center gap-1 truncate text-[0.6rem] font-extrabold uppercase tracking-[0.07em] text-[var(--muted)]">
+                  {metric.label}
+                  {metric.tip && <InfoTip text={metric.tip} label={`Qué cuenta ${metric.label}`} />}
+                </p>
                 <strong className="display-font text-xl font-bold leading-none tabular-nums sm:text-2xl">{metric.value}</strong>
               </div>
             </article>
@@ -156,6 +218,8 @@ export default function CasinoPage() {
           <CheckCircle2 size={17} className="text-[var(--pine-soft)]" /> {toast}
         </div>
       )}
+
+      <Tour steps={panelTourSteps} storageKey="enbandeja-tour-panel-seen" autoStart={false} reopenSignal={tourSignal} />
     </>
   );
 }
@@ -275,7 +339,10 @@ function DeliveriesView({
           <input className="field min-h-12 !pl-10 !pr-10 text-sm font-semibold" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar alumno o curso..." />
           {search && <button type="button" className="absolute right-2 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded-lg text-[var(--muted)] hover:bg-[var(--navy-soft)]" onClick={() => setSearch("")} aria-label="Limpiar búsqueda"><X size={17} /></button>}
         </label>
-        <div className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+        <p className="mb-0 mt-3 flex items-center gap-1.5 text-[0.65rem] font-extrabold uppercase tracking-[0.06em] text-[var(--muted)]">
+          Filtros <InfoTip text={infoTips.pendingFilterDefault} label="Por qué parte en Pendientes" />
+        </p>
+        <div className="mt-2 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
           <div className="flex min-h-11 rounded-lg bg-[oklch(94%_0.014_110)] p-1" role="group" aria-label="Filtrar por estado">
             {(["pending", "delivered", "all"] as StatusFilter[]).map((item) => {
               const labels = { pending: "Pendientes", delivered: "Entregados", all: "Todos" };

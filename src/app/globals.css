@@ -226,6 +226,14 @@ textarea:focus-visible {
   to { opacity: 1; transform: translateY(0); }
 }
 
+.tour-highlight {
+  position: relative;
+  z-index: 30;
+  outline: 3px solid var(--terra);
+  outline-offset: 3px;
+  border-radius: 0.9rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
